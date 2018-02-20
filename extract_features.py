@@ -7,8 +7,7 @@
 #	--output ../datasets/flowers17/hdf5/features.hdf5
 
 # import the necessary packages
-from keras.applications import InceptionV3
-from keras.applications import VGG16
+from keras.applications import ResNet50
 from keras.applications import imagenet_utils
 from keras.preprocessing.image import img_to_array
 from keras.preprocessing.image import load_img
@@ -69,15 +68,14 @@ labels = data_label[:, 1]
 le = LabelEncoder()
 labels = le.fit_transform(labels)
 
-# load the VGG16 network
+# load the ResNet50 network
 print("[INFO] loading network...")
-model = VGG16(weights="imagenet", include_top=False)
-# model = InceptionV3(weights="imagenet", include_top=False)
+model = ResNet50(weights="imagenet", include_top=False)
 # model.summary()
 
 # initialize the HDF5 dataset writer, then store the class label
 # names in the dataset
-dataset = HDF5DatasetWriter((len(imagePaths), 512 * 7 * 7), args["output"], dataKey="features",
+dataset = HDF5DatasetWriter((len(imagePaths), 2048), args["output"], dataKey="features",
                             bufSize=args["buffer_size"])
 # dataset.storeClassLabels(le.classes_)
 
@@ -117,7 +115,7 @@ for i in np.arange(0, len(imagePaths), bs):
 
     # reshape the features so that each image is represented by
     # a flattened feature vector of the `MaxPooling2D` outputs
-    features = features.reshape((features.shape[0], 512 * 7 * 7))
+    features = features.reshape((features.shape[0], 2048))
 
     # add the features and labels to our HDF5 dataset
     dataset.add(features, batchLabels)
